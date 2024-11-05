@@ -12,6 +12,11 @@ export const router = createRouter({
       component: HomeView
     },
     {
+      path: '/index',
+      name: 'index',
+      component: IndexView
+    },
+    {
       path: '/login',
       name: 'login',
       component: LoginView
