@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { FormInstance, FormRules } from 'element-plus'
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus' // 引入 ElMessage 组件
 import { useAuthStore } from '@/stores/auth'
@@ -8,7 +7,6 @@ import { useRouter } from 'vue-router'
 const authStore = useAuthStore()
 const errorMessage = ref('')
 const router = useRouter()
-const activeName = ref('first')
 
 const formData = reactive({
   loginId: '',

@@ -1,5 +1,15 @@
 <script lang="ts" setup>
-import { Avatar, Notebook, Headset, Setting, Film, Opportunity } from '@element-plus/icons-vue'
+import {
+  Avatar,
+  Notebook,
+  Headset,
+  Setting,
+  Film,
+  Opportunity,
+  UserFilled,
+  Switch,
+  HomeFilled
+} from '@element-plus/icons-vue'
 </script>
 <template>
   <div class="index">
@@ -74,7 +84,34 @@ import { Avatar, Notebook, Headset, Setting, Film, Opportunity } from '@element-
       </el-menu>
     </div>
     <div class="right">
-      <div class="top">2</div>
+      <div class="top">
+        <el-menu
+          :ellipsis="false"
+          class="el-menu-demo"
+          mode="horizontal"
+          background-color="#545c64"
+          text-color="#fff"
+          active-text-color="#ffd04b"
+        >
+          <el-menu-item index="1">
+            <el-icon><Switch /></el-icon>
+            LogintHistory
+          </el-menu-item>
+          <el-menu-item index="2">
+            <el-icon><HomeFilled /></el-icon>
+            Home
+          </el-menu-item>
+          <el-sub-menu index="2">
+            <template #title>
+              <el-icon><UserFilled /></el-icon>
+              Admin
+            </template>
+            <el-menu-item index="2-1">UserProfile</el-menu-item>
+            <el-menu-item index="2-2">changePassword</el-menu-item>
+            <el-menu-item index="2-3">LoginOut</el-menu-item>
+          </el-sub-menu>
+        </el-menu>
+      </div>
       <div class="content">3</div>
     </div>
   </div>
@@ -108,10 +145,14 @@ import { Avatar, Notebook, Headset, Setting, Film, Opportunity } from '@element-
     flex-direction: column;
     .top {
       height: 60px;
-      background-color: #d5eaff;
+      background-color: #666b70;
+      display: flex;
+      justify-content: flex-end;
+      border-bottom-width: none;
     }
     .content {
       flex: 1;
+      padding: 5px;
     }
   }
 }
