@@ -1,5 +1,5 @@
 <script lang="ts" setup></script>
 <template>
-  <div></div>
+  <div>NovelChapter</div>
 </template>
 <style scoped></style>

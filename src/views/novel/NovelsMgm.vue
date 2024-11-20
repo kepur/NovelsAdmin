@@ -1,5 +1,5 @@
 <script lang="ts" setup></script>
 <template>
-  <div></div>
+  <div>NovelsMgm</div>
 </template>
 <style scoped></style>
