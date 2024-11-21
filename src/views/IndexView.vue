@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useAuthStore } from '@/stores/auth'
 import {
   Avatar,
   Notebook,
@@ -10,6 +11,18 @@ import {
   Switch,
   HomeFilled
 } from '@element-plus/icons-vue'
+const authStore = useAuthStore()
+
+import { ElMessage } from 'element-plus'
+
+const handleLogout = async () => {
+  try {
+    await authStore.logout()
+    ElMessage.success('Logout successful')
+  } catch (error) {
+    ElMessage.error('Logout failed')
+  }
+}
 </script>
 <template>
   <div class="index">
@@ -77,8 +90,8 @@ import {
           </template>
           <el-menu-item index="/index/usercomment">Comment</el-menu-item>
           <el-menu-item index="/index/userrole">UserRole</el-menu-item>
-          <!-- <el-menu-item index="/index/userrole">Login History</el-menu-item>
-          <el-menu-item index="/index/userrole">User Login Ip</el-menu-item> -->
+          <el-menu-item index="/index/usermgm">User Mgm</el-menu-item>
+          <!-- <el-menu-item index="/index/userrole">User Login Ip</el-menu-item> -->
           <el-menu-item index="/index/supportlang">SupportConvertLang</el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -92,7 +105,7 @@ import {
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#ffd04b"
-          router="true"
+          :router="true"
         >
           <el-menu-item index="/index/loginhistory">
             <el-icon><Switch /></el-icon>
@@ -109,7 +122,7 @@ import {
             </template>
             <el-menu-item index="/index/userprofile">UserProfile</el-menu-item>
             <el-menu-item index="/index/changepassword">changePassword</el-menu-item>
-            <el-menu-item index="2-3">LoginOut</el-menu-item>
+            <el-menu-item @click="handleLogout">LoginOut</el-menu-item>
           </el-sub-menu>
         </el-menu>
       </div>

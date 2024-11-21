@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import AboutView from '@/views/OllamaPrompt.vue'
 import IndexView from '@/views/IndexView.vue'
 import LoginView from '@/views/LoginView.vue'
-// import { path } from 'node_modules/axios/index.ts'
+import { useAuthStore } from '@/stores/auth'
+
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -58,6 +58,11 @@ export const router = createRouter({
           component: () => import('../views/user/UserProfile.vue')
         },
         {
+          path: 'usermgm',
+          name: 'usermgm',
+          component: () => import('../views/user/UserMgm.vue')
+        },
+        {
           path: 'userrole',
           name: 'userrole',
           component: () => import('../views/user/UserRole.vue')
@@ -110,7 +115,7 @@ export const router = createRouter({
         {
           path: 'loginhistory',
           name: 'loginhistory',
-          component: () => import('../views/LoginHistory.vue')
+          component: () => import('../views/user/UserMgm.vue')
         },
         {
           path: 'userprofile',
@@ -136,4 +141,18 @@ export const router = createRouter({
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  authStore.loadStoredToken()
+  console.log('开始验证路由')
+  if (!authStore.isAuthenticated() && to.path !== '/login') {
+    return next({ name: 'login' })
+  }
+  // 如果用户已登录且访问登录页面，跳转到首页
+  if (authStore.isAuthenticated() && to.path === '/login') {
+    return next({ name: 'home' })
+  }
+  next()
+})
+
 export default router

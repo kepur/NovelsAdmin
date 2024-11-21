@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/auth'
 import { storeToRefs } from 'pinia' // 引入 storeToRefs
-import { baseURL_dev } from '@/config/baseURL'
+import { baseURL_dev } from '@/config/baseConfig'
 
 const api = axios.create({
   baseURL: baseURL_dev // 基础 API 地址
@@ -19,4 +19,5 @@ api.interceptors.request.use((config) => {
   }
   return config
 })
+
 export default api
