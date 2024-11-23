@@ -28,3 +28,31 @@ export const deleteUser = (id: number) => {
 export const fetchAllRoles = () => {
   return api.get('roles')
 }
+
+export const fetchUserCollects = () => {
+  return api.get('user_collects')
+}
+
+export const deleteUserCollect = (id: number) => {
+  return api.delete(`user_collects/${id}`)
+}
+
+export const fetchUserLikes = () => {
+  return api.get('user_likes')
+}
+
+export const deleteUserLike = (id: number) => {
+  return api.delete(`user_likes/${id}`)
+}
+
+export const fetchUserPoints = () => {
+  return api.get('user_points')
+}
+
+export const createUserPoint = (data: { user_id: number; points: number; reason: string }) => {
+  return api.post('user_points', data)
+}
+
+export const deleteUserPoint = (id: number) => {
+  return api.delete(`user_points/${id}`)
+}

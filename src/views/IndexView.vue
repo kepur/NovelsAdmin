@@ -28,7 +28,6 @@
             <span>User Mgmt</span>
           </template>
           <el-menu-item index="/index/usercollect">UserCollect</el-menu-item>
-          <el-menu-item index="/index/userlike">UserLike</el-menu-item>
           <el-menu-item index="/index/userpoint">UserPoint</el-menu-item>
         </el-sub-menu>
 
