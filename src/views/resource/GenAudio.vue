@@ -3,41 +3,47 @@
 <template>
   <div>
     <el-button type="primary" @click="openDialog">Add New Audio</el-button>
-    <el-table :data="genAudios" style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" class-name="col-10"></el-table-column>
-      <el-table-column prop="chapter_title" label="Chapter" class-name="col-10"></el-table-column>
-      <el-table-column
-        prop="audio_style_name"
-        label="Audio Style"
-        class-name="col-10"
-      ></el-table-column>
-      <el-table-column prop="audio_url" label="Audio File" class-name="col-10">
+    <el-table :data="genAudios" style="width: 100%" v-loading="loading" border>
+      <el-table-column prop="id" label="ID" width="100"></el-table-column>
+      <el-table-column prop="chapter_title" label="Chapter" width="100"></el-table-column>
+      <el-table-column prop="audio_style_name" label="Audio Style" width="100"></el-table-column>
+      <el-table-column prop="audio_url" label="Audio File" width="100">
         <template #default="scope">
-          <el-link :href="scope.row.audio_url" target="_blank">{{
-            scope.row.audio_file_name
-          }}</el-link>
+          <el-link :href="scope.row.audio_url" target="_blank">
+            {{ scope.row.audio_file_name }}
+          </el-link>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="Created At" class-name="col-10"></el-table-column>
-      <el-table-column label="Actions" class-name="col-20">
+      <el-table-column prop="created_at" label="Created At" width="100"></el-table-column>
+      <el-table-column label="Actions" width="auto">
         <template #default="scope">
-          <el-button
-            size="small"
-            type="primary"
-            @click="playAudio(scope.row.audio_url)"
-            class="action-button"
-          >
-            Play
-          </el-button>
-          <el-button
-            size="small"
-            type="danger"
-            @click="deleteAudio(scope.row.id)"
-            class="action-button"
-            style="margin-left: 10px"
-          >
-            Delete
-          </el-button>
+          <div class="actions-container">
+            <el-button
+              size="small"
+              type="primary"
+              @click="toggleAudio(scope.row.id, scope.row.audio_url)"
+              class="action-button"
+            >
+              {{ isPlaying(scope.row.id) ? 'Pause' : 'Play' }}
+            </el-button>
+            <el-button
+              size="small"
+              type="danger"
+              @click="deleteAudio(scope.row.id)"
+              class="action-button"
+            >
+              Delete
+            </el-button>
+          </div>
+          <!-- Audio Player -->
+          <div v-if="currentAudioId === scope.row.id" class="audio-player-container">
+            <audio
+              ref="audioPlayers"
+              :src="scope.row.audio_url"
+              controls
+              @ended="onAudioEnded"
+            ></audio>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -110,9 +116,6 @@
         :status="progress < 100 ? 'active' : 'success'"
       ></el-progress>
     </el-dialog>
-
-    <!-- Audio Player -->
-    <audio ref="audioPlayer" :src="currentAudioUrl" controls class="audio-player"></audio>
   </div>
 </template>
 
@@ -193,8 +196,7 @@ const marks = {
 
 const formatTooltip = (val: number) => `${val >= 0 ? '+' : ''}${val}%`
 
-const currentAudioUrl = ref('')
-const audioPlayer = ref<HTMLAudioElement | null>(null)
+const currentAudioId = ref<number | null>(null)
 
 // Load all GenAudios
 const loadGenAudios = async () => {
@@ -335,12 +337,30 @@ const deleteAudio = async (id: number) => {
   }
 }
 
-// Play Audio
-const playAudio = (url: string) => {
-  currentAudioUrl.value = url
-  if (audioPlayer.value) {
-    audioPlayer.value.play()
+// Toggle Audio Player
+const toggleAudio = (id: number, url: string) => {
+  if (currentAudioId.value === id) {
+    // If clicking the same row, pause and hide the audio player
+    currentAudioId.value = null
+    const audioElement = document.getElementById(`audio-player-${id}`) as HTMLAudioElement
+    if (audioElement) {
+      audioElement.pause()
+      audioElement.currentTime = 0
+    }
+  } else {
+    // If clicking a different row, set currentAudioId to the new id
+    currentAudioId.value = id
   }
+}
+
+// Check if a row is currently playing
+const isPlaying = (id: number) => {
+  return currentAudioId.value === id
+}
+
+// Handle audio ended event
+const onAudioEnded = () => {
+  currentAudioId.value = null
 }
 
 onMounted(() => {
@@ -351,23 +371,36 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dialog-footer {
-  text-align: right;
-}
-
-.audio-player {
-  width: 100px; /* Set audio player width to 100px */
-}
-
-.col-10 {
-  width: 10%; /* Approximately 10% */
-}
-
-.col-20 {
-  width: 20%; /* Approximately 20% */
+.actions-container {
+  display: flex;
+  align-items: center;
 }
 
 .action-button {
-  width: 100px;
+  margin-right: 10px;
+  width: 200px;
+}
+
+.audio-player-container {
+  margin-top: 10px;
+}
+
+.el-table th,
+.el-table td {
+  text-align: center;
+}
+
+.el-table-column {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.el-table .el-table__body-wrapper {
+  overflow-x: auto;
+}
+
+.audio-player {
+  width: 100%;
 }
 </style>

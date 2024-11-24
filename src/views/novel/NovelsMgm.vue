@@ -44,7 +44,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <!-- Author (仅管理员可见) -->
+
         <el-form-item v-if="isAdmin" label="Author" prop="author_id">
           <el-select v-model="formData.author_id" placeholder="Select Author">
             <el-option
@@ -68,11 +68,10 @@
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { fetchNovels, createNovel, updateNovel, deleteNovel as deleteNovelAPI } from '@/utils/novel'
-import { fetchSupports } from '@/utils/lang' // 更新为您的 supports.ts 文件路径
-import { fetchUsers } from '@/utils/user' // 更新为您的 users.ts 文件路径
+import { fetchSupports } from '@/utils/lang'
+import { fetchUsers } from '@/utils/user'
 import { useAuthStore } from '@/stores/auth'
 
-// 定义小说数据的接口
 interface Novel {
   id: number | null
   name: string
@@ -84,7 +83,6 @@ interface Novel {
   created_at?: string
 }
 
-// 响应式引用数据和状态
 const novels = ref<Novel[]>([])
 const loading = ref(false)
 const dialogVisible = ref(false)
@@ -95,27 +93,23 @@ const formData = ref<Novel>({
   author_id: null,
   language: null
 })
-const formRef = ref() // 表单实例的引用
+const formRef = ref()
 
-const languages = ref<{ id: number; language_name: string }[]>([]) // 所有可用的语言
-const users = ref<{ id: number; username: string }[]>([]) // 所有用户
-const userMap = ref<{ [key: number]: string }>({}) // author_id 到 username 的映射
+const languages = ref<{ id: number; language_name: string }[]>([])
+const users = ref<{ id: number; username: string }[]>([])
+const userMap = ref<{ [key: number]: string }>({})
 
-// 验证规则
 const rules = {
   name: [{ required: true, message: 'Please enter Novel Name', trigger: 'blur' }],
   language: [{ required: true, message: 'Please select Language', trigger: 'change' }]
 }
 
-// 用户权限
 const authStore = useAuthStore()
 const isAdmin = computed(() => authStore.userRoles.includes('admin'))
 
-// 加载小说数据
 const loadNovels = async () => {
   loading.value = true
   try {
-    // 指定需要的字段
     const response = await fetchNovels([
       'id',
       'name',
@@ -126,7 +120,6 @@ const loadNovels = async () => {
       'created_at'
     ])
     if (Array.isArray(response.data.novels)) {
-      // 为每个小说添加 author_name
       novels.value = response.data.novels.map((novel: Novel) => {
         return {
           ...novel,
@@ -143,11 +136,9 @@ const loadNovels = async () => {
   }
 }
 
-// 加载所有语言
 const loadLanguages = async () => {
   try {
     const response = await fetchSupports()
-    // 数据在 response.data.supports 中
     if (Array.isArray(response.data.supports)) {
       languages.value = response.data.supports.map((lang: any) => ({
         id: lang.id,
@@ -161,17 +152,14 @@ const loadLanguages = async () => {
   }
 }
 
-// 加载所有用户
 const loadUsers = async () => {
   try {
     const response = await fetchUsers()
-    // 数据是一个数组
     if (Array.isArray(response.data)) {
       users.value = response.data.map((user: any) => ({
         id: user.id,
         username: user.username
       }))
-      // 构建 author_id 到 username 的映射
       userMap.value = {}
       users.value.forEach((user) => {
         userMap.value[user.id] = user.username
@@ -184,53 +172,47 @@ const loadUsers = async () => {
   }
 }
 
-// 打开对话框
 const openDialog = (novel: Novel | null) => {
   if (novel) {
     formData.value = { ...novel }
   } else {
-    formData.value = { id: null, name: '', description: '', author_id: null, language: null }
+    formData.value = { id: null, name: '', description: '', author_id: null, language: null } // author_id: null
   }
   dialogVisible.value = true
 }
 
-// 提交表单
 const submitForm = async () => {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid: boolean) => {
+  try {
+    const valid = await formRef.value.validate()
     if (valid) {
-      try {
-        if (formData.value.id) {
-          // 更新现有小说
-          await updateNovel(formData.value.id, {
-            name: formData.value.name,
-            description: formData.value.description,
-            language: formData.value.language,
-            author_id: formData.value.author_id
-          })
-          ElMessage.success('Novel updated successfully')
-        } else {
-          // 创建新小说
-          await createNovel({
-            name: formData.value.name,
-            description: formData.value.description,
-            language: formData.value.language!,
-            author_id: formData.value.author_id
-          })
-          ElMessage.success('Novel added successfully')
-        }
-        dialogVisible.value = false
-        loadNovels()
-      } catch (error: any) {
-        ElMessage.error(error.response?.data?.message || 'Failed to submit novel')
+      if (formData.value.id) {
+        await updateNovel(formData.value.id, {
+          name: formData.value.name,
+          description: formData.value.description,
+          language: formData.value.language,
+          author_id: formData.value.author_id
+        })
+        ElMessage.success('Novel updated successfully')
+      } else {
+        await createNovel({
+          name: formData.value.name,
+          description: formData.value.description,
+          language: formData.value.language!,
+          author_id: formData.value.author_id ?? undefined // 将 null 转换为 undefined
+        })
+        ElMessage.success('Novel added successfully')
       }
+      dialogVisible.value = false
+      loadNovels()
     } else {
       ElMessage.error('Please fill in the required fields')
     }
-  })
+  } catch (error: any) {
+    ElMessage.error(error.response?.data?.message || 'Failed to submit novel')
+  }
 }
 
-// 删除小说
 const deleteNovel = async (id: number) => {
   try {
     await deleteNovelAPI(id)
@@ -241,7 +223,6 @@ const deleteNovel = async (id: number) => {
   }
 }
 
-// 组件挂载时加载数据
 onMounted(async () => {
   await loadUsers()
   await loadLanguages()

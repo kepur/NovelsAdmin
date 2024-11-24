@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <el-button type="primary" @click="openDialog(null)">Add New Translation</el-button> -->
+    <el-button type="primary" @click="openDialog(null)">Add New Translation</el-button>
     <el-table :data="translations" style="width: 100%" v-loading="loading">
       <el-table-column prop="id" label="ID" width="60"></el-table-column>
       <el-table-column prop="chapter_title" label="Chapter"></el-table-column>
