@@ -10,7 +10,7 @@
         text-color="#fff"
         :router="true"
       >
-        <!-- 系统管理菜单，仅管理员可见 -->
+        <!-- Only Admin -->
         <el-sub-menu v-if="isAdmin" index="6">
           <template #title>
             <el-icon><Setting /></el-icon>
@@ -19,19 +19,18 @@
           <el-menu-item index="/index/usermgm">User Mgm</el-menu-item>
           <el-menu-item index="/index/userrole">UserRole</el-menu-item>
           <el-menu-item index="/index/supportlang">SupportConvertLang</el-menu-item>
+          <el-menu-item index="/index/userpoint">UserPoint</el-menu-item>
         </el-sub-menu>
 
-        <!-- 用户管理菜单 -->
+        <!-- Users admin
         <el-sub-menu index="1">
           <template #title>
             <el-icon><Avatar /></el-icon>
             <span>User Mgmt</span>
           </template>
-          <el-menu-item index="/index/usercollect">UserCollect</el-menu-item>
-          <el-menu-item index="/index/userpoint">UserPoint</el-menu-item>
-        </el-sub-menu>
+        </el-sub-menu> -->
 
-        <!-- 小说管理菜单 -->
+        <!-- Novels -->
         <el-sub-menu index="2">
           <template #title>
             <el-icon><Notebook /></el-icon>
@@ -42,7 +41,7 @@
           <el-menu-item index="/index/novelchapter">NovelChapter</el-menu-item>
         </el-sub-menu>
 
-        <!-- 翻译管理菜单 -->
+        <!-- Translang -->
         <el-sub-menu index="3">
           <template #title>
             <el-icon><Film /></el-icon>
@@ -53,7 +52,7 @@
           <el-menu-item index="/index/usercorrection">UserCorrectionHistory</el-menu-item>
         </el-sub-menu>
 
-        <!-- 资源管理菜单 -->
+        <!-- Resource -->
         <el-sub-menu index="4">
           <template #title>
             <el-icon><Headset /></el-icon>
@@ -64,7 +63,7 @@
           <el-menu-item index="/index/resourcegenaudio">GenAudio</el-menu-item>
         </el-sub-menu>
 
-        <!-- AI 模型菜单 -->
+        <!-- AI  -->
         <el-sub-menu index="5">
           <template #title>
             <el-icon><Opportunity /></el-icon>

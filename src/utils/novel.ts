@@ -49,6 +49,11 @@ export const createChapter = (data: {
   return api.post('novel_chapters', data)
 }
 
+// Fetch chapters for a specific novel
+export const fetchChaptersByNovel = (novelId: number) => {
+  return api.get(`novels/${novelId}/chapters`)
+}
+
 // Update an existing chapter
 export const updateChapter = (id: number, data: any) => {
   return api.put(`novel_chapters/${id}`, data)

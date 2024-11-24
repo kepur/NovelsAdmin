@@ -53,21 +53,9 @@ export const router = createRouter({
           meta: { requiresAuth: true }
         },
         {
-          path: 'usercollect',
-          name: 'usercollect',
-          component: () => import('../views/user/UserCollect.vue'),
-          meta: { requiresAuth: true }
-        },
-        {
           path: 'usercomment',
           name: 'usercomment',
           component: () => import('../views/user/UserComment.vue'),
-          meta: { requiresAuth: true }
-        },
-        {
-          path: 'userlike',
-          name: 'userlike',
-          component: () => import('../views/user/UserLike.vue'),
           meta: { requiresAuth: true }
         },
         {
