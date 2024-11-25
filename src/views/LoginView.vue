@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus' // 引入 ElMessage 组件
+import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 
@@ -13,18 +13,14 @@ const formData = reactive({
   loginPwd: ''
 })
 
-// 验证用户名
 const validateLoginId = (rule: any, value: any, callback: any) => {
   if (value === '') {
-    // 如果用户名为空，则调用 callback 并传入错误信息
     callback(new Error('Please input username'))
   } else {
-    // 如果验证通过，调用 callback 不传参数
     callback()
   }
 }
 
-// 验证密码
 const validateLoginPwd = (rule: any, value: any, callback: any) => {
   if (value === '') {
     callback(new Error('Please input password'))
@@ -33,28 +29,25 @@ const validateLoginPwd = (rule: any, value: any, callback: any) => {
   }
 }
 
-// 验证规则对象
 const rules = reactive<FormRules>({
   loginId: [{ validator: validateLoginId, trigger: 'blur' }],
   loginPwd: [{ validator: validateLoginPwd, trigger: 'blur' }]
 })
 
-// 登录逻辑
 const submitForm = async () => {
   try {
     if (!formData.loginId || !formData.loginPwd) {
-      errorMessage.value = '请填写用户名和密码'
+      errorMessage.value = 'Plz input ur username'
       return
     }
     await authStore.login(formData.loginId, formData.loginPwd)
-    // 登录成功后显示成功提示，并重定向到受保护页面
-    ElMessage.success('登录成功') // 添加登录成功提示
+    ElMessage.success('Login success')
     if (authStore.isAuthenticated()) {
-      router.push('/index') // 登录成功后重定向到受保护的页面
+      router.push('/index') //
     }
   } catch (error) {
-    errorMessage.value = '登录失败，请重试' + error
-    ElMessage.error(errorMessage.value) // 使用 ElMessage 弹出提示
+    errorMessage.value = 'Login Faild Plz retry' + error
+    ElMessage.error(errorMessage.value)
   }
 }
 </script>
@@ -98,7 +91,7 @@ const submitForm = async () => {
       color: #fff;
       font-size: 20px;
       margin-bottom: 20px;
-      text-align: center; // 单独居中 h2
+      text-align: center;
     }
 
     ::v-deep .el-form-item__label {
