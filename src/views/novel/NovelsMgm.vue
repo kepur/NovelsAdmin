@@ -4,7 +4,11 @@
     <el-table :data="novels" style="width: 100%" v-loading="loading">
       <el-table-column prop="id" label="ID" width="60"></el-table-column>
       <el-table-column prop="name" label="Name"></el-table-column>
-      <el-table-column prop="description" label="Description"></el-table-column>
+      <el-table-column prop="description" label="Description">
+        <template #default="scope">
+          <div class="two-line-ellipsis">{{ scope.row.description }}</div>
+        </template>
+      </el-table-column>
       <el-table-column prop="author_name" label="Author"></el-table-column>
       <el-table-column prop="language_name" label="Language"></el-table-column>
       <el-table-column prop="created_at" label="Created At"></el-table-column>
@@ -233,5 +237,15 @@ onMounted(async () => {
 <style scoped>
 .dialog-footer {
   text-align: right;
+}
+
+.two-line-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 3em;
+  line-height: 1.5em;
 }
 </style>
