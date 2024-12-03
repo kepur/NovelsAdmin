@@ -1,5 +1,3 @@
-<!-- src/views/audio/GenAudios.vue -->
-
 <template>
   <div>
     <el-button type="primary" @click="openDialog">Add New Audio</el-button>
@@ -113,7 +111,7 @@
     >
       <el-progress
         :percentage="progress"
-        :status="progress < 100 ? 'active' : 'success'"
+        :status="progress < 100 ? 'success' : 'success'"
       ></el-progress>
     </el-dialog>
   </div>
