@@ -1,5 +1,5 @@
 <script lang="ts" setup></script>
 <template>
-  <div>更改密码</div>
+  <div>Comming future</div>
 </template>
 <style scoped></style>
