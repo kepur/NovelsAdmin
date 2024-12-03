@@ -209,7 +209,7 @@ const submitForm = async () => {
 
         ElMessage.success("Image generation started");
         dialogVisible.value = false;
-        loadGenImages(); // 直接刷新页面
+        loadGenImages(); 
       } catch (error: any) {
         ElMessage.error(
           error.response?.data?.message || "Failed to create GenImage"
