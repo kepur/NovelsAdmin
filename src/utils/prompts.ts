@@ -13,10 +13,23 @@ export const updateOllamaPrompt = (
 ) => api.put(`/ollama_prompts/${id}`, data)
 export const deleteOllamaPrompt = (id: number) => api.delete(`/ollama_prompts/${id}`)
 
+
+
 // StableDiffusionParam API
+export interface StableDiffusionParam {
+  positive_prompt?: string; // Optional field for positive prompt
+  negative_prompt?: string; // Optional field for negative prompt
+  model_choice?: string; // Optional model choice
+  steps?: number; // Optional steps value; default is handled in the backend
+}
+
 export const fetchStableDiffusionParams = () => api.get('/stable_diffusion_params')
+
+
+
 export const fetchStableDiffusionParamById = (id: number) =>
   api.get(`/stable_diffusion_params/${id}`)
+
 export const createStableDiffusionParam = (data: {
   ollama_prompt_id: number
   positive_prompt?: string
@@ -24,6 +37,7 @@ export const createStableDiffusionParam = (data: {
   model_choice?: string
   steps?: number
 }) => api.post('/stable_diffusion_params', data)
+
 export const updateStableDiffusionParam = (
   id: number,
   data: {

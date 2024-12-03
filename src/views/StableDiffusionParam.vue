@@ -1,16 +1,26 @@
-<!-- src/views/StableDiffusionParam.vue -->
 <template>
   <div>
     <el-button type="primary" @click="openDialog(null)">Create New Parameter</el-button>
     <el-table :data="params" style="width: 100%" v-loading="loading">
       <el-table-column prop="id" label="ID" width="60"></el-table-column>
-      <el-table-column prop="ollama_prompt.prompt_text" label="Ollama Prompt"></el-table-column>
-      <el-table-column prop="positive_prompt" label="Positive Prompt"></el-table-column>
-      <el-table-column prop="negative_prompt" label="Negative Prompt"></el-table-column>
+      <el-table-column prop="ollama_prompt.prompt_text" label="Ollama Prompt">
+        <template #default="scope">
+          <div class="two-line-ellipsis">{{ scope.row.ollama_prompt?.prompt_text }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="positive_prompt" label="Positive Prompt">
+        <template #default="scope">
+          <div class="two-line-ellipsis">{{ scope.row.positive_prompt }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="negative_prompt" label="Negative Prompt">
+        <template #default="scope">
+          <div class="two-line-ellipsis">{{ scope.row.negative_prompt }}</div>
+        </template>
+      </el-table-column>
       <el-table-column prop="model_choice" label="Model Choice"></el-table-column>
       <el-table-column prop="steps" label="Steps"></el-table-column>
       <el-table-column prop="created_at" label="Created At"></el-table-column>
-      <!-- Include other fields if necessary -->
       <el-table-column label="Actions" width="180">
         <template #default="scope">
           <el-button size="mini" @click="openDialog(scope.row)">Edit</el-button>
@@ -19,10 +29,8 @@
       </el-table-column>
     </el-table>
 
-    <!-- Dialog -->
-    <el-dialog v-model="dialogVisible" title="Stable Diffusion Parameter">
+    <el-dialog v-model="dialogVisible" title="Stable Diffusion Parameters">
       <el-form :model="formData" ref="formRef" :rules="rules" label-width="140px">
-        <!-- Ollama Prompt -->
         <el-form-item label="Ollama Prompt" prop="ollama_prompt_id">
           <el-select v-model="formData.ollama_prompt_id" placeholder="Select Ollama Prompt">
             <el-option
@@ -33,23 +41,18 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <!-- Positive Prompt -->
         <el-form-item label="Positive Prompt" prop="positive_prompt">
           <el-input type="textarea" v-model="formData.positive_prompt"></el-input>
         </el-form-item>
-        <!-- Negative Prompt -->
         <el-form-item label="Negative Prompt" prop="negative_prompt">
           <el-input type="textarea" v-model="formData.negative_prompt"></el-input>
         </el-form-item>
-        <!-- Model Choice -->
         <el-form-item label="Model Choice" prop="model_choice">
           <el-input v-model="formData.model_choice"></el-input>
         </el-form-item>
-        <!-- Steps -->
         <el-form-item label="Steps" prop="steps">
           <el-input v-model="formData.steps" type="number"></el-input>
         </el-form-item>
-        <!-- Include other fields if necessary -->
       </el-form>
       <template #footer>
         <el-button @click="dialogVisible = false">Cancel</el-button>
@@ -80,14 +83,12 @@ interface StableDiffusionParam {
   steps: number | null
   created_at?: string
   ollama_prompt?: Prompt
-  // Include other fields if necessary
 }
 
 interface Prompt {
   id: number
   prompt_type: string
   prompt_text: string
-  // Include other fields if necessary
 }
 
 // Reactive references
@@ -103,15 +104,15 @@ const formData = ref<StableDiffusionParam>({
   model_choice: '',
   steps: null
 })
-const formRef = ref() // Reference to the form instance
+const formRef = ref() // Form instance reference
 
 // Validation rules
 const rules = {
-  ollama_prompt_id: [{ required: true, message: 'Please select Ollama Prompt', trigger: 'change' }],
-  positive_prompt: [{ required: true, message: 'Please enter Positive Prompt', trigger: 'blur' }],
-  negative_prompt: [{ required: true, message: 'Please enter Negative Prompt', trigger: 'blur' }],
-  model_choice: [{ required: true, message: 'Please enter Model Choice', trigger: 'blur' }],
-  steps: [{ required: true, message: 'Please enter Steps', trigger: 'blur' }]
+  ollama_prompt_id: [{ required: true, message: 'Please select an Ollama Prompt', trigger: 'change' }],
+  positive_prompt: [{ required: true, message: 'Please enter a positive prompt', trigger: 'blur' }],
+  negative_prompt: [{ required: true, message: 'Please enter a negative prompt', trigger: 'blur' }],
+  model_choice: [{ required: true, message: 'Please enter the model choice', trigger: 'blur' }],
+  steps: [{ required: true, message: 'Please enter the number of steps', trigger: 'blur' }]
 }
 
 // Load StableDiffusionParams
@@ -137,7 +138,7 @@ const loadOllamaPrompts = async () => {
   }
 }
 
-// Open dialog for create or edit
+// Open dialog for creation or editing
 const openDialog = (param: StableDiffusionParam | null) => {
   if (param) {
     // Edit existing parameter
@@ -162,23 +163,23 @@ const submitForm = async () => {
   await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
       try {
+        const payload = {
+          ollama_prompt_id: formData.value.ollama_prompt_id || undefined,
+          positive_prompt: formData.value.positive_prompt,
+          negative_prompt: formData.value.negative_prompt,
+          model_choice: formData.value.model_choice,
+          steps: formData.value.steps || undefined
+        }
+
         if (formData.value.id) {
           // Update existing parameter
-          await updateStableDiffusionParam(formData.value.id, {
-            ollama_prompt_id: formData.value.ollama_prompt_id,
-            positive_prompt: formData.value.positive_prompt,
-            negative_prompt: formData.value.negative_prompt,
-            model_choice: formData.value.model_choice,
-            steps: formData.value.steps
-          })
+          await updateStableDiffusionParam(formData.value.id, payload)
           ElMessage.success('Parameter updated successfully')
         } else {
           // Create new parameter
           await createStableDiffusionParam({
+            ...payload,
             ollama_prompt_id: formData.value.ollama_prompt_id!,
-            positive_prompt: formData.value.positive_prompt,
-            negative_prompt: formData.value.negative_prompt,
-            model_choice: formData.value.model_choice,
             steps: formData.value.steps!
           })
           ElMessage.success('Parameter created successfully')
@@ -186,7 +187,7 @@ const submitForm = async () => {
         dialogVisible.value = false
         loadParams()
       } catch (error) {
-        ElMessage.error('Failed to submit parameter')
+        ElMessage.error('Failed to submit parameters')
       }
     } else {
       ElMessage.error('Please fill in the required fields')
@@ -194,7 +195,7 @@ const submitForm = async () => {
   })
 }
 
-// Delete a parameter
+// Delete parameter
 const deleteParam = async (id: number) => {
   try {
     await deleteStableDiffusionParam(id)
@@ -205,7 +206,7 @@ const deleteParam = async (id: number) => {
   }
 }
 
-// Load data when component is mounted
+// Load data on component mount
 onMounted(() => {
   loadParams()
   loadOllamaPrompts()
@@ -215,5 +216,15 @@ onMounted(() => {
 <style scoped>
 .dialog-footer {
   text-align: right;
+}
+
+.two-line-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 3em;
+  line-height: 1.5em;
 }
 </style>

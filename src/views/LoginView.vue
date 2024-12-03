@@ -3,6 +3,7 @@ import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import type { FormRules } from 'element-plus';
 
 const authStore = useAuthStore()
 const errorMessage = ref('')
@@ -28,11 +29,10 @@ const validateLoginPwd = (rule: any, value: any, callback: any) => {
     callback()
   }
 }
-
 const rules = reactive<FormRules>({
   loginId: [{ validator: validateLoginId, trigger: 'blur' }],
-  loginPwd: [{ validator: validateLoginPwd, trigger: 'blur' }]
-})
+  loginPwd: [{ validator: validateLoginPwd, trigger: 'blur' }],
+});
 
 const submitForm = async () => {
   try {
