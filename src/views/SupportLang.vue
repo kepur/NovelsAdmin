@@ -46,7 +46,6 @@ import {
   deleteSupport as deleteSupportAPI
 } from '@/utils/lang'
 
-// 定义支持数据的接口
 interface Support {
   id: number | null
   language_code: string
@@ -54,7 +53,6 @@ interface Support {
   created_at?: string
 }
 
-// 响应式引用数据和状态
 const supports = ref<Support[]>([])
 const loading = ref(false)
 const dialogVisible = ref(false)
@@ -63,15 +61,14 @@ const formData = ref<Support>({
   language_code: '',
   language_name: ''
 })
-const formRef = ref() // 表单实例的引用
+const formRef = ref() 
 
-// 验证规则
 const rules = {
   language_code: [{ required: true, message: 'Please enter Language Code', trigger: 'blur' }],
   language_name: [{ required: true, message: 'Please enter Language Name', trigger: 'blur' }]
 }
 
-// 加载支持数据
+
 const loadSupports = async () => {
   loading.value = true
   try {
@@ -88,7 +85,6 @@ const loadSupports = async () => {
   }
 }
 
-// 打开对话框
 const openDialog = (support: Support | null) => {
   if (support) {
     formData.value = { ...support }
@@ -98,21 +94,19 @@ const openDialog = (support: Support | null) => {
   dialogVisible.value = true
 }
 
-// 提交表单
+
 const submitForm = async () => {
   if (!formRef.value) return
   await formRef.value.validate(async (valid: boolean) => {
     if (valid) {
       try {
         if (formData.value.id) {
-          // 更新现有支持
           await updateSupport(formData.value.id, {
             language_code: formData.value.language_code,
             language_name: formData.value.language_name
           })
           ElMessage.success('Support updated successfully')
         } else {
-          // 创建新支持
           await createSupport({
             language_code: formData.value.language_code,
             language_name: formData.value.language_name
@@ -130,7 +124,6 @@ const submitForm = async () => {
   })
 }
 
-// 删除支持
 const deleteSupport = async (id: number) => {
   try {
     await deleteSupportAPI(id)
@@ -141,7 +134,6 @@ const deleteSupport = async (id: number) => {
   }
 }
 
-// 组件挂载时加载数据
 onMounted(() => {
   loadSupports()
 })

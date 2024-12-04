@@ -1,6 +1,5 @@
 import api from './api'
 
-// 获取所有小说，支持字段选择
 export const fetchNovels = (fields?: string[]) => {
   return api.get('novels', {
     params: {

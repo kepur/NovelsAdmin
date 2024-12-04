@@ -20,7 +20,6 @@ export const router = createRouter({
       component: IndexView,
       meta: { requiresAuth: true },
       children: [
-        // 用户管理路由，需要管理员权限
         {
           path: 'usermgm',
           name: 'usermgm',
@@ -33,7 +32,7 @@ export const router = createRouter({
           component: () => import('../views/user/UserRole.vue'),
           meta: { requiresAuth: true, requiresAdmin: true }
         },
-        // 其他路由，普通用户可访问
+        // normal user
         {
           path: 'novelstyle',
           name: 'novelstyle',
@@ -152,27 +151,24 @@ export const router = createRouter({
   ]
 })
 
-// 路由守卫，检查权限
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const { token, userRoles } = storeToRefs(authStore)
 
-  // 加载存储的 token 和角色信息
   authStore.loadStoredToken()
 
-  console.log('开始验证路由')
+  console.log('star check router')
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
-    // 如果路由需要认证且用户未认证，跳转到登录页
+
     return next({ name: 'login' })
   }
 
   if (to.meta.requiresAdmin && !userRoles.value.includes('admin')) {
-    // 如果路由需要管理员权限且用户不是管理员，跳转到无权限页面或首页
-    return next({ name: 'home' }) // 或者您可以创建一个专门的无权限页面
+    return next({ name: 'home' }) 
   }
 
-  // 如果用户已登录且访问登录页面，跳转到首页
+
   if (authStore.isAuthenticated() && to.path === '/login') {
     return next({ name: 'home' })
   }

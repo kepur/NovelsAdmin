@@ -67,7 +67,6 @@ const loadStyles = async () => {
   }
 }
 
-// 打开对话框
 const openDialog = (style: NovelStyle | null) => {
   if (style) {
     formData.value = { ...style }
