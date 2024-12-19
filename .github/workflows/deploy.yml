@@ -33,7 +33,7 @@ jobs:
 
             echo "拉取最新代码..."
             git fetch main main
-            git reset --hard main/main
+            # git reset --hard main/main
 
             echo "重启服务..."
             ./autobot.sh restart  # 重启服务脚本
