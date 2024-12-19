@@ -8,7 +8,6 @@ import router from './router'
 import 'virtual:svg-icons-register'
 const app = createApp(App)
 
-//引入自定义插件对象
 import globalComponent from './components/RegistComponents'
 app.use(createPinia())
 app.use(globalComponent)
