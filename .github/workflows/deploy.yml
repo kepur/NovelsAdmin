@@ -32,7 +32,8 @@ jobs:
             cd /opt/soundOfNovels/NovelsAdmin || exit 1
 
             echo "拉取最新代码..."
-            git fetch main main
+            git pull
+            # git fetch main main
             # git reset --hard main/main
 
             echo "重启服务..."
