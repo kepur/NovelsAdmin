@@ -24,6 +24,20 @@ use_node_version() {
     log_message "已切换到 Node v23.4.0"
 }
 
+# 强制拉取远程最新代码
+update_code() {
+    log_message "放弃本地修改并拉取远程最新代码..."
+    cd "$PROJECT_ROOT" || exit
+    git fetch --all >> "$LOG_FILE" 2>&1
+    git reset --hard origin/main >> "$LOG_FILE" 2>&1
+    if [ $? -ne 0 ]; then
+        log_message "拉取最新代码失败！"
+        echo "拉取最新代码失败！"
+        exit 1
+    fi
+    log_message "成功拉取远程最新代码"
+}
+
 # 启动服务
 start() {
     if [ -f "$PID_FILE" ] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
@@ -35,8 +49,10 @@ start() {
     log_message "切换到正确的 Node 版本..."
     use_node_version  # 确保使用正确的 Node 版本
 
+    log_message "更新本地代码..."
+    update_code  # 强制拉取远程最新代码
+
     log_message "安装依赖..."
-    cd "$PROJECT_ROOT" || exit
     npm install >> "$LOG_FILE" 2>&1
 
     log_message "构建 Vue 项目..."
