@@ -3,9 +3,17 @@
 import api from './api'
 
 // Fetch all GenAudios
-export const fetchGenAudios = () => {
-  return api.get('gen_audios')
-}
+// export const fetchGenAudios = () => {
+//   return api.get('gen_audios')
+// }
+export const fetchGenAudios = (params: {
+    page: number ;
+    per_page: number;
+    search: string;
+  }) => {
+  return api.get('gen_audios', { params })
+  }
+
 
 // Fetch a single GenAudio by ID
 export const fetchGenAudio = (id: number) => {

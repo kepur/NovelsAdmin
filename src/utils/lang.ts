@@ -2,8 +2,15 @@
 
 import api from './api'
 
-export const fetchSupports = () => {
-  return api.get('supports')
+export const fetchSupportLangChoices = () => {
+  return api.get('supportlang_choices')
+}
+export const fetchSupports = (params: {
+  page: number
+  per_page: number
+  search: string
+}) => {
+  return api.get('supports', { params })
 }
 
 export const createSupport = (data: { language_code: string; language_name: string }) => {
@@ -18,9 +25,18 @@ export const deleteSupport = (id: number) => {
   return api.delete(`supports/${id}`)
 }
 
+// Fetch all audio choices
+export const fetchAudioStyleChoics = () => {
+  return api.get('audio_style_choices')
+}
+
 // Fetch all audio styles
-export const fetchAudioStyles = () => {
-  return api.get('audio_styles')
+export const fetchAudioStyles = (params:{
+  page:number;
+  per_page:number;
+  search:string;
+}) => {
+  return api.get('audio_styles',{params})
 }
 
 // Create a new audio style

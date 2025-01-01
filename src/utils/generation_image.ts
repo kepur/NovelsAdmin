@@ -1,7 +1,11 @@
 import api from './api'
 
-export const FetchGenImages=()=>{
-    return api.get('gen_imgs')
+export const FetchGenImages=(params:{
+    page:number;
+    per_page:number;
+    search:string;
+})=>{
+  return api.get('gen_imgs',{params})
 }
 
 export const fetchGenImage = (id: number) => {

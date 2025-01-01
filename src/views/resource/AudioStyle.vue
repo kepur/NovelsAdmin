@@ -1,53 +1,3 @@
-<template>
-  <div>
-    <el-button type="primary" @click="openDialog(null)">Add New Audio Style</el-button>
-    <el-table :data="audioStyles" style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="60"></el-table-column>
-      <el-table-column prop="language_name" label="Language"></el-table-column>
-      <el-table-column prop="style_name" label="Style Name"></el-table-column>
-      <el-table-column prop="voice_type" label="Voice Type"></el-table-column>
-      <el-table-column prop="created_at" label="Created At"></el-table-column>
-      <el-table-column label="Actions" width="180">
-        <template #default="scope">
-          <el-button size="small" @click="openDialog(scope.row)">Edit</el-button>
-          <el-button size="small" type="danger" @click="deleteAudioStyle(scope.row.id)"
-            >Delete</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- Dialog -->
-    <el-dialog v-model="dialogVisible" title="Audio Style">
-      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
-        <!-- Language -->
-        <el-form-item label="Language" prop="language_code_id">
-          <el-select v-model="formData.language_code_id" placeholder="Select Language">
-            <el-option
-              v-for="lang in languages"
-              :key="lang.id"
-              :label="lang.language_name"
-              :value="lang.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <!-- Style Name -->
-        <el-form-item label="Style Name" prop="style_name">
-          <el-input v-model="formData.style_name" placeholder="Enter Style Name"></el-input>
-        </el-form-item>
-        <!-- Voice Type -->
-        <el-form-item label="Voice Type" prop="voice_type">
-          <el-input v-model="formData.voice_type" placeholder="Enter Voice Type"></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="submitForm">Confirm</el-button>
-      </template>
-    </el-dialog>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -57,7 +7,7 @@ import {
   updateAudioStyle,
   deleteAudioStyle as deleteAudioStyleAPI
 } from '@/utils/lang'
-import { fetchSupports } from '@/utils/lang'
+import { fetchSupportLangChoices } from '@/utils/lang'
 
 interface AudioStyle {
   id: number | null
@@ -72,6 +22,13 @@ const audioStyles = ref<AudioStyle[]>([])
 const languages = ref<{ id: number; language_name: string }[]>([])
 const loading = ref(false)
 const dialogVisible = ref(false)
+const searchStyle = ref(''); 
+const currentPage = ref(1); 
+const pageSize = ref(10); 
+const totalItems = ref(0); 
+
+
+
 const formData = ref<AudioStyle>({
   id: null,
   language_code_id: null,
@@ -89,9 +46,14 @@ const rules = {
 const loadAudioStyles = async () => {
   loading.value = true
   try {
-    const response = await fetchAudioStyles()
-    if (Array.isArray(response.data.audio_styles)) {
-      audioStyles.value = response.data.audio_styles
+    const response = await fetchAudioStyles({
+      page: currentPage.value,
+      per_page: pageSize.value,
+      search: searchStyle.value
+    })
+    if (Array.isArray(response.data.data)) {
+      totalItems.value = response.data.total
+      audioStyles.value = response.data.data
     } else {
       ElMessage.error('Invalid data format received from API')
     }
@@ -104,7 +66,7 @@ const loadAudioStyles = async () => {
 
 const loadLanguages = async () => {
   try {
-    const response = await fetchSupports()
+    const response = await fetchSupportLangChoices()
     if (Array.isArray(response.data.supports)) {
       languages.value = response.data.supports.map((lang: any) => ({
         id: lang.id,
@@ -169,12 +131,87 @@ const deleteAudioStyle = async (id: number) => {
     ElMessage.error(error.response?.data?.message || 'Failed to delete audio style')
   }
 }
+const handleSearch = () => {
+  currentPage.value = 1; // 
+  loadAudioStyles();
+};
+
+const handleSizeChange = (newSize: number) => {
+  pageSize.value = newSize;
+  loadAudioStyles(); // 
+};
+
+const handleCurrentChange = (newPage: number) => {
+  currentPage.value = newPage;
+  loadAudioStyles(); // 
+};
+
 
 onMounted(() => {
   loadAudioStyles()
   loadLanguages()
 })
 </script>
+<template>
+  <div>    
+    <el-button type="primary" @click="openDialog(null)">Add New Audio Style</el-button>
+    <el-input v-model="searchStyle" placeholder="Search Audio" style="width: 200px; margin-left: 15px;" @input="handleSearch"></el-input>
+    <el-button type="primary" @click="handleSearch" style="margin-left: 15px;">reload</el-button>
+    <el-table :data="audioStyles" style="width: 100%" v-loading="loading">
+      <el-table-column prop="id" label="ID" width="60"></el-table-column>
+      <el-table-column prop="language_name" label="Language"></el-table-column>
+      <el-table-column prop="style_name" label="Style Name"></el-table-column>
+      <el-table-column prop="voice_type" label="Voice Type"></el-table-column>
+      <el-table-column prop="created_at" label="Created At"></el-table-column>
+      <el-table-column label="Actions" width="180">
+        <template #default="scope">
+          <el-button size="small" @click="openDialog(scope.row)">Edit</el-button>
+          <el-button size="small" type="danger" @click="deleteAudioStyle(scope.row.id)"
+            >Delete</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :total="totalItems"
+          layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+    <!-- Dialog -->
+    <el-dialog v-model="dialogVisible" title="Audio Style">
+      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
+        <!-- Language -->
+        <el-form-item label="Language" prop="language_code_id">
+          <el-select v-model="formData.language_code_id" placeholder="Select Language">
+            <el-option
+              v-for="lang in languages"
+              :key="lang.id"
+              :label="lang.language_name"
+              :value="lang.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- Style Name -->
+        <el-form-item label="Style Name" prop="style_name">
+          <el-input v-model="formData.style_name" placeholder="Enter Style Name"></el-input>
+        </el-form-item>
+        <!-- Voice Type -->
+        <el-form-item label="Voice Type" prop="voice_type">
+          <el-input v-model="formData.voice_type" placeholder="Enter Voice Type"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitForm">Confirm</el-button>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+
 
 <style scoped>
 .dialog-footer {

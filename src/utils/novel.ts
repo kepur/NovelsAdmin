@@ -1,11 +1,14 @@
 import api from './api'
 
-export const fetchNovels = (fields?: string[]) => {
-  return api.get('novels', {
-    params: {
-      fields: fields ? fields.join(',') : undefined
-    }
-  })
+export const fetchNovelChoices = () => {
+  return api.get('novel_choices')
+}
+export const fetchNovels = (params: {
+  page: number
+  per_page: number
+  search: string
+}) => {
+  return api.get('novels', { params })
 }
 
 export const createNovel = (data: {
@@ -34,9 +37,18 @@ export const fetchUsers = () => {
 }
 
 // Fetch all chapters
-export const fetchChapters = () => {
-  return api.get('novel_chapters')
+export const fetchChapters = (params:{
+  page:number;
+  per_page:number;
+  search:string;
+}) => {
+  return api.get('novel_chapters',{params})
 }
+// Fetch all chapters
+export const fetchChapterChoices = () => {
+  return api.get('novel_chapter_choices')
+}
+
 
 // Create a new chapter
 export const createChapter = (data: {

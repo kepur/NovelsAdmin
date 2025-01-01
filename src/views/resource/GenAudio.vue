@@ -1,121 +1,3 @@
-<template>
-  <div>
-    <el-button type="primary" @click="openDialog">Add New Audio</el-button>
-    <el-table :data="genAudios" style="width: 100%" v-loading="loading" border>
-      <el-table-column prop="id" label="ID" width="100"></el-table-column>
-      <el-table-column prop="chapter_title" label="Chapter" width="100"></el-table-column>
-      <el-table-column prop="audio_style_name" label="Audio Style" width="100"></el-table-column>
-      <el-table-column prop="audio_url" label="Audio File" width="100">
-        <template #default="scope">
-          <el-link :href="scope.row.audio_url" target="_blank">
-            {{ scope.row.audio_file_name }}
-          </el-link>
-        </template>
-      </el-table-column>
-      <el-table-column prop="created_at" label="Created At" width="100"></el-table-column>
-      <el-table-column label="Actions" width="auto">
-        <template #default="scope">
-          <div class="actions-container">
-            <el-button
-              size="small"
-              type="primary"
-              @click="toggleAudio(scope.row.id, scope.row.audio_url)"
-              class="action-button"
-            >
-              {{ isPlaying(scope.row.id) ? 'Pause' : 'Play' }}
-            </el-button>
-            <el-button
-              size="small"
-              type="danger"
-              @click="deleteAudio(scope.row.id)"
-              class="action-button"
-            >
-              Delete
-            </el-button>
-          </div>
-          <!-- Audio Player -->
-          <div v-if="currentAudioId === scope.row.id" class="audio-player-container">
-            <audio
-              ref="audioPlayers"
-              :src="scope.row.audio_url"
-              controls
-              @ended="onAudioEnded"
-            ></audio>
-          </div>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- Add Audio Dialog -->
-    <el-dialog v-model="dialogVisible" title="Generate New Audio">
-      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
-        <!-- Select Novel -->
-        <el-form-item label="Novel" prop="novel_id">
-          <el-select v-model="formData.novel_id" placeholder="Select Novel" @change="onNovelChange">
-            <el-option
-              v-for="novel in novels"
-              :key="novel.id"
-              :label="novel.name"
-              :value="novel.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <!-- Select Chapter -->
-        <el-form-item label="Chapter" prop="chapter_id">
-          <el-select v-model="formData.chapter_id" placeholder="Select Chapter">
-            <el-option
-              v-for="chapter in chapters"
-              :key="chapter.id"
-              :label="chapter.title"
-              :value="chapter.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <!-- Select Audio Style -->
-        <el-form-item label="Audio Style" prop="audio_style_id">
-          <el-select v-model="formData.audio_style_id" placeholder="Select Audio Style">
-            <el-option
-              v-for="style in audioStyles"
-              :key="style.id"
-              :label="style.name"
-              :value="style.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <!-- Speech Rate Slider -->
-        <el-form-item label="Speech Rate" prop="speech_rate">
-          <el-slider
-            v-model="formData.speech_rate"
-            :min="-50"
-            :max="50"
-            :step="10"
-            show-tooltip
-            :marks="marks"
-            :format-tooltip="formatTooltip"
-          ></el-slider>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="submitForm">Generate</el-button>
-      </template>
-    </el-dialog>
-
-    <!-- Progress Dialog -->
-    <el-dialog
-      v-model="progressDialogVisible"
-      title="Audio Generation Progress"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
-    >
-      <el-progress
-        :percentage="progress"
-        :status="progress < 100 ? 'success' : 'success'"
-      ></el-progress>
-    </el-dialog>
-  </div>
-</template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
@@ -126,8 +8,8 @@ import {
   deleteGenAudio,
   fetchGenAudio
 } from '@/utils/generation_audio'
-import { fetchNovels, fetchChaptersByNovel } from '@/utils/novel'
-import { fetchAudioStyles } from '@/utils/lang'
+import { fetchNovelChoices, fetchChaptersByNovel } from '@/utils/novel'
+import { fetchAudioStyleChoics } from '@/utils/lang'
 
 interface GenAudio {
   id: number
@@ -152,7 +34,7 @@ interface Chapter {
 
 interface AudioStyle {
   id: number
-  name: string
+  style_name: string
 }
 
 const genAudios = ref<GenAudio[]>([])
@@ -196,13 +78,25 @@ const formatTooltip = (val: number) => `${val >= 0 ? '+' : ''}${val}%`
 
 const currentAudioId = ref<number | null>(null)
 
+const searchAudio = ref(''); 
+const currentPage = ref(1); 
+const pageSize = ref(5); 
+const totalItems = ref(0); 
+
+
 // Load all GenAudios
 const loadGenAudios = async () => {
   loading.value = true
   try {
-    const response = await fetchGenAudios()
-    if (Array.isArray(response.data.gen_audios)) {
-      genAudios.value = response.data.gen_audios
+    const response = await fetchGenAudios({
+      page: currentPage.value,
+      per_page: pageSize.value,
+      search: searchAudio.value
+    });
+
+    totalItems.value = response.data.total;
+    if (Array.isArray(response.data.data)) {
+      genAudios.value = response.data.data
     } else {
       ElMessage.error('Invalid data format received from API')
     }
@@ -216,7 +110,7 @@ const loadGenAudios = async () => {
 // Load all Novels
 const loadNovels = async () => {
   try {
-    const response = await fetchNovels()
+    const response = await fetchNovelChoices()
     if (Array.isArray(response.data.novels)) {
       novels.value = response.data.novels
     } else {
@@ -230,7 +124,7 @@ const loadNovels = async () => {
 // Load all AudioStyles
 const loadAudioStyles = async () => {
   try {
-    const response = await fetchAudioStyles()
+    const response = await fetchAudioStyleChoics()
     if (Array.isArray(response.data.audio_styles)) {
       audioStyles.value = response.data.audio_styles
     } else {
@@ -254,6 +148,21 @@ const onNovelChange = async (novelId: number) => {
     ElMessage.error(error.response?.data?.message || 'Failed to load chapters')
   }
 }
+const handleSearch = () => {
+  currentPage.value = 1; // 
+  loadGenAudios();
+};
+
+const handleSizeChange = (newSize: number) => {
+  pageSize.value = newSize;
+  loadGenAudios(); // 
+};
+
+const handleCurrentChange = (newPage: number) => {
+  currentPage.value = newPage;
+  loadGenAudios(); // 
+};
+
 
 // Open Add Audio Dialog
 const openDialog = () => {
@@ -367,6 +276,134 @@ onMounted(() => {
   loadAudioStyles()
 })
 </script>
+
+<template>
+  <div>
+    <el-button type="primary" @click="openDialog">Add New Audio</el-button>
+    <el-input v-model="searchAudio" placeholder="Search Audio" style="width: 200px; margin-left: 15px;" @input="handleSearch"></el-input>
+    <el-button type="primary" @click="handleSearch" style="margin-left: 15px;">reload</el-button>
+    <el-table :data="genAudios" style="width: 100%" v-loading="loading" border>
+      <el-table-column prop="id" label="ID" width="100"></el-table-column>
+      <el-table-column prop="chapter_title" label="Chapter" width="250px"></el-table-column>
+      <el-table-column prop="audio_style_name" label="Audio Style" width="100"></el-table-column>
+      <el-table-column prop="audio_url" label="Audio File" width="100">
+        <template #default="scope">
+          <el-link :href="scope.row.audio_url" target="_blank">
+            {{ scope.row.audio_file_name }}
+          </el-link>
+        </template>
+      </el-table-column>
+      <el-table-column prop="created_at" label="Created At" width="100"></el-table-column>
+      <el-table-column label="Actions" width="auto">
+        <template #default="scope">
+          <div class="actions-container">
+            <el-button
+              size="small"
+              type="primary"
+              @click="toggleAudio(scope.row.id, scope.row.audio_url)"
+              class="action-button"
+            >
+              {{ isPlaying(scope.row.id) ? 'Pause' : 'Play' }}
+            </el-button>
+            <el-button
+              size="small"
+              type="danger"
+              @click="deleteAudio(scope.row.id)"
+              class="action-button"
+            >
+              Delete
+            </el-button>
+          </div>
+          <!-- Audio Player -->
+          <div v-if="currentAudioId === scope.row.id" class="audio-player-container">
+            <audio
+              ref="audioPlayers"
+              :src="scope.row.audio_url"
+              controls
+              @ended="onAudioEnded"
+            ></audio>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          :total="totalItems"
+          layout="total, sizes, prev, pager, next, jumper">
+        </el-pagination>
+    <!-- Add Audio Dialog -->
+    <el-dialog v-model="dialogVisible" title="Generate New Audio">
+      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
+        <!-- Select Novel -->
+        <el-form-item label="Novel" prop="novel_id">
+          <el-select v-model="formData.novel_id" placeholder="Select Novel" @change="onNovelChange">
+            <el-option
+              v-for="novel in novels"
+              :key="novel.id"
+              :label="novel.name"
+              :value="novel.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- Select Chapter -->
+        <el-form-item label="Chapter" prop="chapter_id">
+          <el-select v-model="formData.chapter_id" placeholder="Select Chapter">
+            <el-option
+              v-for="chapter in chapters"
+              :key="chapter.id"
+              :label="chapter.title"
+              :value="chapter.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- Select Audio Style -->
+        <el-form-item label="Audio Style" prop="audio_style_id">
+          <el-select v-model="formData.audio_style_id" placeholder="Select Audio Style">
+            <el-option
+              v-for="style in audioStyles"
+              :key="style.id"
+              :label="style.style_name"
+              :value="style.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- Speech Rate Slider -->
+        <el-form-item label="Speech Rate" prop="speech_rate">
+          <el-slider
+            v-model="formData.speech_rate"
+            :min="-50"
+            :max="50"
+            :step="10"
+            show-tooltip
+            :marks="marks"
+            :format-tooltip="formatTooltip"
+          ></el-slider>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitForm">Generate</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- Progress Dialog -->
+    <el-dialog
+      v-model="progressDialogVisible"
+      title="Audio Generation Progress"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+    >
+      <el-progress
+        :percentage="progress"
+        :status="progress < 100 ? 'success' : 'success'"
+      ></el-progress>
+    </el-dialog>
+  </div>
+</template>
 
 <style scoped>
 .actions-container {
