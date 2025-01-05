@@ -32,8 +32,13 @@ interface Chapter {
 
 interface StableParam {
   id: number;
-  prompt_text: string;
+  ollama_prompt: {
+    id: number;
+    prompt_text: string;
+    prompt_type: string;
+  };
 }
+
 
 const dialogVisible = ref(false);
 const genImages = ref<GenImage[]>([]);
@@ -249,7 +254,7 @@ onMounted(() => {
             <el-option
               v-for="param in sdParams"
               :key="param.id"
-              :label="param.prompt_text"
+              :label="param.ollama_prompt.prompt_type"
               :value="param.id"
             ></el-option>
           </el-select>
