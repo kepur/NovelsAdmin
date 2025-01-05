@@ -3,41 +3,41 @@ name: Deploy to Server
 on:
   push:
     branches:
-      - main  # 监听 main 分支的提交
+      - main  # Listen for commits to the main branch
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # 使用 GitHub Actions 提供的 Ubuntu 环境
+    runs-on: ubuntu-latest  # Use the Ubuntu environment provided by GitHub Actions
 
     steps:
-      # 检出代码
+      # Check out the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 设置 SSH 密钥
+      # Set up SSH key
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SGSVR }}  # 使用 GitHub Secrets 中的私钥
+          ssh-private-key: ${{ secrets.SGSVR }}  # Use the private key from GitHub Secrets
 
-      # 检查 SSH 密钥是否加载
+      # Verify if the SSH key is loaded
       - name: Verify SSH key
         run: ssh-add -L
 
-      # 连接到远程服务器并执行命令
+      # Connect to the remote server and execute commands
       - name: Pull latest code and restart server
         run: |
           ssh -o StrictHostKeyChecking=no root@164.152.167.71 << 'EOF'
-            echo "进入项目目录..."
+            echo "Entering project directory..."
             cd /opt/soundOfNovels/NovelsAdmin || exit 1
 
-            echo "拉取最新代码..."
+            echo "Pulling the latest code..."
             git pull
             # git fetch main main
             # git reset --hard main/main
 
-            echo "重启服务..."
-            ./autobot.sh restart  # 重启服务脚本
+            echo "Restarting the service..."
+            ./autobot.sh restart  # Restart service script
 
-            echo "部署完成！"
+            echo "Deployment completed!"
           EOF
