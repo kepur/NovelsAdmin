@@ -1,17 +1,25 @@
 import api from './api'
 
 // Fetch all translations
-export const fetchMachineTranslations = () => {
-  return api.get('machine_translations')
+export const fetchMachineTranslations = (params:{
+  page: number
+  per_page: number
+  search: string
+}
+) => {
+  return api.get('machine_translations',{ params })
 }
 
+// Fetch all translationsChoices
+export const fetchMachineTransChoices= () => {
+  return api.get('machine_translations_choices')
+}
 // Create a new translation
 export const createMachineTranslation = (data: {
   chapter_id: number
-  translated_content: string
   source_language: string
   target_language: string
-  translation_engine: string
+  trans_engine: string
 }) => {
   return api.post('machine_translations', data)
 }

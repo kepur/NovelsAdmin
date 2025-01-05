@@ -57,3 +57,9 @@ export const updateAudioStyle = (id: number, data: any) => {
 export const deleteAudioStyle = (id: number) => {
   return api.delete(`audio_styles/${id}`)
 }
+
+
+// Fetch all trans engines
+export const fetchTransEngines = () => {
+  return api.get('trans_engines')
+}

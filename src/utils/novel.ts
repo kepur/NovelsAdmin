@@ -44,6 +44,8 @@ export const fetchChapters = (params:{
 }) => {
   return api.get('novel_chapters',{params})
 }
+
+
 // Fetch all chapters
 export const fetchChapterChoices = () => {
   return api.get('novel_chapter_choices')
@@ -62,7 +64,7 @@ export const createChapter = (data: {
 
 // Fetch chapters for a specific novel
 export const fetchChaptersByNovel = (novelId: number) => {
-  return api.get(`novels/${novelId}/chapters`)
+  return api.get(`novel_chapter_choices/${novelId}`)
 }
 
 // Update an existing chapter

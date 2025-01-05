@@ -1,58 +1,3 @@
-<template>
-  <div>
-    <!-- <el-button type="primary" @click="openDialog(null)">Add New Correction</el-button> -->
-    <el-table :data="corrections" style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="60"></el-table-column>
-      <el-table-column
-        prop="machine_translation_content"
-        label="Machine Translation"
-      ></el-table-column>
-      <el-table-column prop="username" label="User"></el-table-column>
-      <el-table-column prop="created_at" label="Created At"></el-table-column>
-      <el-table-column label="Actions" width="180">
-        <template #default="scope">
-          <el-button size="small" @click="openDialog(scope.row)">Edit</el-button>
-          <el-button size="small" type="danger" @click="deleteCorrection(scope.row.id)"
-            >Delete</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- Dialog -->
-    <el-dialog v-model="dialogVisible" title="Correction">
-      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
-        <!-- Machine Translation -->
-        <el-form-item label="Machine Translation" prop="machine_translation_id">
-          <el-select
-            v-model="formData.machine_translation_id"
-            placeholder="Select Machine Translation"
-          >
-            <el-option
-              v-for="trans in translations"
-              :key="trans.id"
-              :label="trans.translated_content"
-              :value="trans.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <!-- Corrected Content -->
-        <el-form-item label="Corrected Content" prop="corrected_content">
-          <el-input
-            v-model="formData.corrected_content"
-            type="textarea"
-            placeholder="Enter Corrected Content"
-          ></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="submitForm">Confirm</el-button>
-      </template>
-    </el-dialog>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -62,7 +7,7 @@ import {
   updateUserCorrection,
   deleteUserCorrection
 } from '@/utils/corrections'
-import { fetchMachineTranslations } from '@/utils/trans'
+import { fetchMachineTransChoices } from '@/utils/trans'
 
 interface UserCorrection {
   id: number | null
@@ -111,7 +56,7 @@ const loadCorrections = async () => {
 
 const loadTranslations = async () => {
   try {
-    const response = await fetchMachineTranslations()
+    const response = await fetchMachineTransChoices()
     if (Array.isArray(response.data.translations)) {
       translations.value = response.data.translations.map((trans: any) => ({
         id: trans.id,
@@ -181,6 +126,62 @@ onMounted(() => {
   loadTranslations()
 })
 </script>
+<template>
+  <div>
+    <!-- <el-button type="primary" @click="openDialog(null)">Add New Correction</el-button> -->
+    <el-table :data="corrections" style="width: 100%" v-loading="loading">
+      <el-table-column prop="id" label="ID" width="60"></el-table-column>
+      <el-table-column
+        prop="machine_translation_content"
+        label="Machine Translation"
+      ></el-table-column>
+      <el-table-column prop="username" label="User"></el-table-column>
+      <el-table-column prop="created_at" label="Created At"></el-table-column>
+      <el-table-column label="Actions" width="180">
+        <template #default="scope">
+          <el-button size="small" @click="openDialog(scope.row)">Edit</el-button>
+          <el-button size="small" type="danger" @click="deleteCorrection(scope.row.id)"
+            >Delete</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- Dialog -->
+    <el-dialog v-model="dialogVisible" title="Correction">
+      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
+        <!-- Machine Translation -->
+        <el-form-item label="Machine Translation" prop="machine_translation_id">
+          <el-select
+            v-model="formData.machine_translation_id"
+            placeholder="Select Machine Translation"
+          >
+            <el-option
+              v-for="trans in translations"
+              :key="trans.id"
+              :label="trans.translated_content"
+              :value="trans.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <!-- Corrected Content -->
+        <el-form-item label="Corrected Content" prop="corrected_content">
+          <el-input
+            v-model="formData.corrected_content"
+            type="textarea"
+            placeholder="Enter Corrected Content"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitForm">Confirm</el-button>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+
 
 <style scoped>
 .dialog-footer {
