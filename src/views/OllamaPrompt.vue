@@ -1,44 +1,3 @@
-<!-- src/views/OllamaPrompt.vue -->
-<template>
-  <div>
-    <el-button type="primary" @click="openDialog(null)">Create New Prompt</el-button>
-    <el-table :data="prompts" style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="60"></el-table-column>
-      <el-table-column prop="prompt_type" label="Prompt Type"></el-table-column>
-      <el-table-column prop="prompt_text" label="Prompt Text"></el-table-column>
-      <el-table-column prop="created_at" label="Created At"></el-table-column>
-      <!-- Include other fields if necessary -->
-      <el-table-column label="Actions" width="180">
-        <template #default="scope">
-          <el-button size="mini" @click="openDialog(scope.row)">Edit</el-button>
-          <el-button size="mini" type="danger" @click="deletePrompt(scope.row.id)"
-            >Delete</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- Dialog -->
-    <el-dialog v-model="dialogVisible" title="Ollama Prompt">
-      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
-        <!-- Prompt Type -->
-        <el-form-item label="Prompt Type" prop="prompt_type">
-          <el-input v-model="formData.prompt_type"></el-input>
-        </el-form-item>
-        <!-- Prompt Text -->
-        <el-form-item label="Prompt Text" prop="prompt_text">
-          <el-input type="textarea" v-model="formData.prompt_text"></el-input>
-        </el-form-item>
-        <!-- Include other fields if necessary -->
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="submitForm">Confirm</el-button>
-      </template>
-    </el-dialog>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -146,6 +105,47 @@ onMounted(() => {
   loadPrompts()
 })
 </script>
+<template>
+  <div>
+    <el-button type="primary" @click="openDialog(null)">Create New Prompt</el-button>
+    <el-table :data="prompts" style="width: 100%" v-loading="loading">
+      <el-table-column prop="id" label="ID" width="60"></el-table-column>
+      <el-table-column prop="prompt_type" label="Prompt Type"></el-table-column>
+      <el-table-column prop="prompt_text" label="Prompt Text"></el-table-column>
+      <el-table-column prop="created_at" label="Created At"></el-table-column>
+      <!-- Include other fields if necessary -->
+      <el-table-column label="Actions" width="180">
+        <template #default="scope">
+          <el-button size="small" @click="openDialog(scope.row)">Edit</el-button>
+          <el-button size="small" type="danger" @click="deletePrompt(scope.row.id)"
+            >Delete</el-button
+          >
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- Dialog -->
+    <el-dialog v-model="dialogVisible" title="Ollama Prompt">
+      <el-form :model="formData" ref="formRef" :rules="rules" label-width="120px">
+        <!-- Prompt Type -->
+        <el-form-item label="Prompt Type" prop="prompt_type">
+          <el-input v-model="formData.prompt_type"></el-input>
+        </el-form-item>
+        <!-- Prompt Text -->
+        <el-form-item label="Prompt Text" prop="prompt_text">
+          <el-input type="textarea" v-model="formData.prompt_text"></el-input>
+        </el-form-item>
+        <!-- Include other fields if necessary -->
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitForm">Confirm</el-button>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+
 
 <style scoped>
 .dialog-footer {

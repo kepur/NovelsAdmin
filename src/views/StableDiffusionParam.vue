@@ -1,67 +1,3 @@
-<template>
-  <div>
-    <el-button type="primary" @click="openDialog(null)">Create New Parameter</el-button>
-    <el-table :data="params" style="width: 100%" v-loading="loading">
-      <el-table-column prop="id" label="ID" width="60"></el-table-column>
-      <el-table-column prop="ollama_prompt.prompt_text" label="Ollama Prompt">
-        <template #default="scope">
-          <div class="two-line-ellipsis">{{ scope.row.ollama_prompt?.prompt_text }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="positive_prompt" label="Positive Prompt">
-        <template #default="scope">
-          <div class="two-line-ellipsis">{{ scope.row.positive_prompt }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="negative_prompt" label="Negative Prompt">
-        <template #default="scope">
-          <div class="two-line-ellipsis">{{ scope.row.negative_prompt }}</div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="model_choice" label="Model Choice"></el-table-column>
-      <el-table-column prop="steps" label="Steps"></el-table-column>
-      <el-table-column prop="created_at" label="Created At"></el-table-column>
-      <el-table-column label="Actions" width="180">
-        <template #default="scope">
-          <el-button size="mini" @click="openDialog(scope.row)">Edit</el-button>
-          <el-button size="mini" type="danger" @click="deleteParam(scope.row.id)">Delete</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <el-dialog v-model="dialogVisible" title="Stable Diffusion Parameters">
-      <el-form :model="formData" ref="formRef" :rules="rules" label-width="140px">
-        <el-form-item label="Ollama Prompt" prop="ollama_prompt_id">
-          <el-select v-model="formData.ollama_prompt_id" placeholder="Select Ollama Prompt">
-            <el-option
-              v-for="prompt in ollamaPrompts"
-              :key="prompt.id"
-              :label="prompt.prompt_text"
-              :value="prompt.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Positive Prompt" prop="positive_prompt">
-          <el-input type="textarea" v-model="formData.positive_prompt"></el-input>
-        </el-form-item>
-        <el-form-item label="Negative Prompt" prop="negative_prompt">
-          <el-input type="textarea" v-model="formData.negative_prompt"></el-input>
-        </el-form-item>
-        <el-form-item label="Model Choice" prop="model_choice">
-          <el-input v-model="formData.model_choice"></el-input>
-        </el-form-item>
-        <el-form-item label="Steps" prop="steps">
-          <el-input v-model="formData.steps" type="number"></el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="submitForm">Confirm</el-button>
-      </template>
-    </el-dialog>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -212,6 +148,72 @@ onMounted(() => {
   loadOllamaPrompts()
 })
 </script>
+
+<template>
+  <div>
+    <el-button type="primary" @click="openDialog(null)">Create New Parameter</el-button>
+    <el-table :data="params" style="width: 100%" v-loading="loading">
+      <el-table-column prop="id" label="ID" width="60"></el-table-column>
+      <el-table-column prop="ollama_prompt.prompt_text" label="Ollama Prompt">
+        <template #default="scope">
+          <div class="two-line-ellipsis">{{ scope.row.ollama_prompt?.prompt_text }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="positive_prompt" label="Positive Prompt">
+        <template #default="scope">
+          <div class="two-line-ellipsis">{{ scope.row.positive_prompt }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="negative_prompt" label="Negative Prompt">
+        <template #default="scope">
+          <div class="two-line-ellipsis">{{ scope.row.negative_prompt }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="model_choice" label="Model Choice"></el-table-column>
+      <el-table-column prop="steps" label="Steps"></el-table-column>
+      <el-table-column prop="created_at" label="Created At"></el-table-column>
+      <el-table-column label="Actions" width="180">
+        <template #default="scope">
+          <el-button size="small" @click="openDialog(scope.row)">Edit</el-button>
+          <el-button size="small" type="danger" @click="deleteParam(scope.row.id)">Delete</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog v-model="dialogVisible" title="Stable Diffusion Parameters">
+      <el-form :model="formData" ref="formRef" :rules="rules" label-width="140px">
+        <el-form-item label="Ollama Prompt" prop="ollama_prompt_id">
+          <el-select v-model="formData.ollama_prompt_id" placeholder="Select Ollama Prompt">
+            <el-option
+              v-for="prompt in ollamaPrompts"
+              :key="prompt.id"
+              :label="prompt.prompt_text"
+              :value="prompt.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Positive Prompt" prop="positive_prompt">
+          <el-input type="textarea" v-model="formData.positive_prompt"></el-input>
+        </el-form-item>
+        <el-form-item label="Negative Prompt" prop="negative_prompt">
+          <el-input type="textarea" v-model="formData.negative_prompt"></el-input>
+        </el-form-item>
+        <el-form-item label="Model Choice" prop="model_choice">
+          <el-input v-model="formData.model_choice"></el-input>
+        </el-form-item>
+        <el-form-item label="Steps" prop="steps">
+          <el-input v-model="formData.steps" type="number"></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitForm">Confirm</el-button>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+
 
 <style scoped>
 .dialog-footer {
